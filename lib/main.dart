@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false, // Opsional: hilangkan banner debug
-      home: NetworkPage(), // Network sekarang punya akses ke Directionality dari MaterialApp
+      home: Network(), // Network sekarang punya akses ke Directionality dari MaterialApp
     );
   }
 }
