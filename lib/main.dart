@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:limit_kuota/src/features/monitoring/network_page.dart';
+import 'package:praktikum_ppb2_limitkuota_kelompok4b/src/features/monitoring/network_page.dart';
 
 void main() {
   // Jalankan MyApp, bukan langsung Network
