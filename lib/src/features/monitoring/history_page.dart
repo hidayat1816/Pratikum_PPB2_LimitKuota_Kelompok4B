@@ -18,12 +18,9 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   void _refreshHistory() {
-    setState(() {
-      _historyList = DatabaseHelper.instance.getHistory();
-    });
+    _historyList = DatabaseHelper.instance.getHistory();
   }
 
-  // Helper untuk format bytes (sama seperti di Network page)
   String _formatBytes(int bytes) {
     if (bytes <= 0) return "0.00 MB";
     double mb = bytes / (1024 * 1024);
@@ -36,36 +33,113 @@ class _HistoryPageState extends State<HistoryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Riwayat Penggunaan")),
+      backgroundColor: Colors.grey.shade100,
+
+      appBar: AppBar(
+        title: const Text("Riwayat Penggunaan"),
+        centerTitle: true,
+        backgroundColor: Colors.blue,
+        elevation: 0,
+      ),
+
       body: FutureBuilder<List<Map<String, dynamic>>>(
         future: _historyList,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text("Error: ${snapshot.error}"));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text("Belum ada riwayat data."));
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+
+          if (snapshot.hasError) {
+            return Center(
+              child: Text("Error: ${snapshot.error}"),
+            );
+          }
+
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Icon(Icons.history, size: 80, color: Colors.grey),
+                  SizedBox(height: 10),
+                  Text(
+                    "Belum ada riwayat data",
+                    style: TextStyle(fontSize: 18),
+                  ),
+                ],
+              ),
+            );
           }
 
           final data = snapshot.data!;
+
           return ListView.builder(
+            padding: const EdgeInsets.all(12),
             itemCount: data.length,
             itemBuilder: (context, index) {
               final item = data[index];
-              return Card(
-                margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                child: ListTile(
-                  leading: const Icon(Icons.history, color: Colors.blue),
-                  title: Text(
-                    item['date'], // Tanggal (YYYY-MM-DD)
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  subtitle: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+              return Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(15),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.shade300,
+                      blurRadius: 6,
+                      offset: const Offset(0, 3),
+                    )
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(15),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("WiFi: ${_formatBytes(item['wifi'])}"),
-                      Text("Mobile: ${_formatBytes(item['mobile'])}"),
+
+                      // tanggal
+                      Row(
+                        children: [
+                          const Icon(Icons.calendar_today,
+                              color: Colors.blue, size: 20),
+                          const SizedBox(width: 8),
+                          Text(
+                            item['date'],
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 15),
+
+                      Row(
+                        mainAxisAlignment:
+                            MainAxisAlignment.spaceBetween,
+                        children: [
+
+                          // wifi
+                          _usageBox(
+                            "WiFi",
+                            _formatBytes(item['wifi']),
+                            Icons.wifi,
+                            Colors.blue,
+                          ),
+
+                          // mobile
+                          _usageBox(
+                            "Mobile",
+                            _formatBytes(item['mobile']),
+                            Icons.signal_cellular_alt,
+                            Colors.green,
+                          ),
+                        ],
+                      )
                     ],
                   ),
                 ),
@@ -73,6 +147,43 @@ class _HistoryPageState extends State<HistoryPage> {
             },
           );
         },
+      ),
+    );
+  }
+
+  Widget _usageBox(
+      String title,
+      String value,
+      IconData icon,
+      Color color,
+      ) {
+    return Container(
+      width: 140,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: color),
+          const SizedBox(height: 5),
+          Text(
+            title,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+          ),
+          const SizedBox(height: 5),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          )
+        ],
       ),
     );
   }
