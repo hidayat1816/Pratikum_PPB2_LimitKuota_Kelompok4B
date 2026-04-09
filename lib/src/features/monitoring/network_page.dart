@@ -58,7 +58,7 @@ class _NetworkState extends State<Network> {
   }
 
   Future<void> checkLimitAndWarn(int currentUsage) async {
-    int limitInBytes = 1024 * 1024 * 1024;
+    int limitInBytes = 10 * 1024 * 1024 * 1024;
 
     if (currentUsage >= limitInBytes) {
       showDialog(
