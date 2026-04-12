@@ -46,15 +46,11 @@ class _HistoryPageState extends State<HistoryPage> {
         future: _historyList,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
+            return const Center(child: CircularProgressIndicator());
           }
 
           if (snapshot.hasError) {
-            return Center(
-              child: Text("Error: ${snapshot.error}"),
-            );
+            return Center(child: Text("Error: ${snapshot.error}"));
           }
 
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -91,7 +87,7 @@ class _HistoryPageState extends State<HistoryPage> {
                       color: Colors.grey.shade300,
                       blurRadius: 6,
                       offset: const Offset(0, 3),
-                    )
+                    ),
                   ],
                 ),
                 child: Padding(
@@ -99,12 +95,14 @@ class _HistoryPageState extends State<HistoryPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-
                       // tanggal
                       Row(
                         children: [
-                          const Icon(Icons.calendar_today,
-                              color: Colors.blue, size: 20),
+                          const Icon(
+                            Icons.calendar_today,
+                            color: Colors.blue,
+                            size: 20,
+                          ),
                           const SizedBox(width: 8),
                           Text(
                             item['date'],
@@ -119,10 +117,8 @@ class _HistoryPageState extends State<HistoryPage> {
                       const SizedBox(height: 15),
 
                       Row(
-                        mainAxisAlignment:
-                            MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-
                           // wifi
                           _usageBox(
                             "WiFi",
@@ -139,7 +135,7 @@ class _HistoryPageState extends State<HistoryPage> {
                             Colors.green,
                           ),
                         ],
-                      )
+                      ),
                     ],
                   ),
                 ),
@@ -151,12 +147,7 @@ class _HistoryPageState extends State<HistoryPage> {
     );
   }
 
-  Widget _usageBox(
-      String title,
-      String value,
-      IconData icon,
-      Color color,
-      ) {
+  Widget _usageBox(String title, String value, IconData icon, Color color) {
     return Container(
       width: 140,
       padding: const EdgeInsets.all(12),
@@ -170,19 +161,13 @@ class _HistoryPageState extends State<HistoryPage> {
           const SizedBox(height: 5),
           Text(
             title,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
+            style: TextStyle(fontWeight: FontWeight.bold, color: color),
           ),
           const SizedBox(height: 5),
           Text(
             value,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          )
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
         ],
       ),
     );
