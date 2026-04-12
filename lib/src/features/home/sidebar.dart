@@ -11,11 +11,8 @@ class Sidebar extends StatelessWidget {
     return Drawer(
       child: ListView(
         children: [
-
           const DrawerHeader(
-            decoration: BoxDecoration(
-              color: Colors.blue,
-            ),
+            decoration: BoxDecoration(color: Colors.blue),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -35,9 +32,7 @@ class Sidebar extends StatelessWidget {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const HomePage(),
-                ),
+                MaterialPageRoute(builder: (context) => const HomePage()),
               );
             },
           ),
@@ -48,9 +43,7 @@ class Sidebar extends StatelessWidget {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const Network(),
-                ),
+                MaterialPageRoute(builder: (context) => const Network()),
               );
             },
           ),
@@ -61,9 +54,7 @@ class Sidebar extends StatelessWidget {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const HistoryPage(),
-                ),
+                MaterialPageRoute(builder: (context) => const HistoryPage()),
               );
             },
           ),
