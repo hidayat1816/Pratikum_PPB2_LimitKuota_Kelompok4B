@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'src/core/services/notification_service.dart';
 import 'src/features/home/home_page.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await NotificationService.init(); // 🔥 WAJIB
+
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -13,9 +18,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Limit Kuota',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      theme: ThemeData(primarySwatch: Colors.blue),
       home: const HomePage(),
     );
   }
