@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import '../../../pages/limit_setting_page.dart';
 import '../monitoring/network_page.dart';
 import '../monitoring/history_page.dart';
 import 'sidebar.dart';
+
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -10,15 +12,30 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: const Sidebar(),
+
+      // 🔥 APPBAR DENGAN TOMBOL SETTINGS
       appBar: AppBar(
         title: const Text("Limit Kuota"),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => LimitSettingPage(),
+                ),
+              );
+            },
+          )
+        ],
       ),
+
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-
             // CARD KUOTA
             Card(
               elevation: 4,
@@ -46,9 +63,7 @@ class HomePage extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => const Network(),
-                  ),
+                  MaterialPageRoute(builder: (context) => const Network()),
                 );
               },
               child: const Text("Monitoring Network"),
@@ -60,9 +75,7 @@ class HomePage extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => const HistoryPage(),
-                  ),
+                  MaterialPageRoute(builder: (context) => const HistoryPage()),
                 );
               },
               child: const Text("History Pemakaian"),
