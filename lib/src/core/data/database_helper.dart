@@ -49,4 +49,9 @@ class DatabaseHelper {
     // Ambil data diurutkan dari tanggal terbaru
     return await db.query('history', orderBy: 'date DESC');
   }
+
+  Future<List<Map<String, dynamic>>> getAllData() async {
+    final db = await instance.database;
+    return await db.query('history', orderBy: 'date ASC');
+}
 }
