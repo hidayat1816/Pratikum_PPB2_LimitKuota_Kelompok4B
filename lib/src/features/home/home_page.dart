@@ -52,7 +52,6 @@ class _HomePageState extends State<HomePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
         
-
             // 🔥 HEADER MODERN + CHART
             Container(
               width: double.infinity,
@@ -118,7 +117,6 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
 
-            // 🔥 LEGEND
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: const [
@@ -134,7 +132,7 @@ class _HomePageState extends State<HomePage> {
 
             const SizedBox(height: 20),
 
-            // 🔥 CARD INFO
+            //  CARD INFO
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
@@ -167,7 +165,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // 🔥 CARD WIDGET
+  //  CARD WIDGET
   Widget _infoCard({
     required IconData icon,
     required String title,
