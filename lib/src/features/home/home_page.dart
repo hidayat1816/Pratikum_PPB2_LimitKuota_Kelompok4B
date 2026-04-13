@@ -1,18 +1,10 @@
 import 'package:flutter/material.dart';
-<<<<<<< HEAD
-=======
 import 'package:fl_chart/fl_chart.dart';
 
->>>>>>> bfed3f8d6e63ea1119f0bca22e1b394f0b4b07b5
 import '../../../pages/limit_setting_page.dart';
 import '../monitoring/network_page.dart';
 import '../monitoring/history_page.dart';
 import 'sidebar.dart';
-<<<<<<< HEAD
-
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
-=======
 
 // 🔥 TAMBAHAN DATABASE
 import 'package:praktikum_ppb2_limitkuota_kelompok4b/src/core/data/database_helper.dart';
@@ -65,17 +57,12 @@ class _HomePageState extends State<HomePage> {
 
     return spots;
   }
->>>>>>> bfed3f8d6e63ea1119f0bca22e1b394f0b4b07b5
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: const Sidebar(),
 
-<<<<<<< HEAD
-      // 🔥 APPBAR DENGAN TOMBOL SETTINGS
-=======
->>>>>>> bfed3f8d6e63ea1119f0bca22e1b394f0b4b07b5
       appBar: AppBar(
         title: const Text("Limit Kuota"),
         centerTitle: true,
@@ -86,11 +73,7 @@ class _HomePageState extends State<HomePage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-<<<<<<< HEAD
-                  builder: (context) => LimitSettingPage(),
-=======
                   builder: (_) => LimitSettingPage(),
->>>>>>> bfed3f8d6e63ea1119f0bca22e1b394f0b4b07b5
                 ),
               );
             },
@@ -100,56 +83,6 @@ class _HomePageState extends State<HomePage> {
 
       body: Padding(
         padding: const EdgeInsets.all(20),
-<<<<<<< HEAD
-        child: Column(
-          children: [
-            // CARD KUOTA
-            Card(
-              elevation: 4,
-              child: ListTile(
-                leading: const Icon(Icons.data_usage, size: 40),
-                title: const Text("Kuota Tersisa"),
-                subtitle: const Text("8 GB"),
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            Card(
-              elevation: 4,
-              child: ListTile(
-                leading: const Icon(Icons.network_check, size: 40),
-                title: const Text("Status Internet"),
-                subtitle: const Text("Aktif"),
-              ),
-            ),
-
-            const SizedBox(height: 30),
-
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const Network()),
-                );
-              },
-              child: const Text("Monitoring Network"),
-            ),
-
-            const SizedBox(height: 10),
-
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const HistoryPage()),
-                );
-              },
-              child: const Text("History Pemakaian"),
-            ),
-          ],
-        ),
-=======
         child: data.isEmpty
             ? const Center(child: Text("Belum ada data"))
             : Column(
@@ -260,7 +193,6 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ],
               ),
->>>>>>> bfed3f8d6e63ea1119f0bca22e1b394f0b4b07b5
       ),
     );
   }
