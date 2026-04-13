@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import '../monitoring/network_page.dart';
-import '../monitoring/history_page.dart';
 import 'sidebar.dart';
 import 'package:praktikum_ppb2_limitkuota_kelompok4b/src/core/data/database_helper.dart';
 
@@ -37,6 +35,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    double total = wifiMB + mobileMB;
+
     return Scaffold(
       drawer: const Sidebar(),
       backgroundColor: Colors.grey[100],
@@ -49,8 +49,11 @@ class _HomePageState extends State<HomePage> {
 
       body: SingleChildScrollView(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 🔥 HEADER MODERN
+        
+
+            // 🔥 HEADER MODERN + CHART
             Container(
               width: double.infinity,
               margin: const EdgeInsets.all(16),
@@ -69,7 +72,6 @@ class _HomePageState extends State<HomePage> {
                   ),
                   const SizedBox(height: 15),
 
-                  // 🔥 PIE CHART BAGUS
                   SizedBox(
                     height: 150,
                     child: PieChart(
@@ -91,8 +93,7 @@ class _HomePageState extends State<HomePage> {
                             value: mobileMB,
                             color: Colors.green,
                             radius: 40,
-                            // ignore: unnecessary_string_interpolations
-                            title: "${mobileMB.toStringAsFixed(0)}",
+                            title: mobileMB.toStringAsFixed(0),
                             titleStyle: const TextStyle(
                               color: Colors.white,
                               fontSize: 12,
@@ -106,7 +107,7 @@ class _HomePageState extends State<HomePage> {
                   const SizedBox(height: 10),
 
                   Text(
-                    "${(wifiMB + mobileMB).toStringAsFixed(1)} MB",
+                    "${total.toStringAsFixed(1)} MB",
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 20,
@@ -141,7 +142,7 @@ class _HomePageState extends State<HomePage> {
                   _infoCard(
                     icon: Icons.data_usage,
                     title: "Total Pemakaian",
-                    value: "${(wifiMB + mobileMB).toStringAsFixed(2)} MB",
+                    value: "${total.toStringAsFixed(2)} MB",
                   ),
                   const SizedBox(height: 10),
                   _infoCard(
@@ -149,51 +150,11 @@ class _HomePageState extends State<HomePage> {
                     title: "Status Internet",
                     value: "Aktif",
                   ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            // 🔥 BUTTON MODERN
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                children: [
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepPurple,
-                      foregroundColor: Colors.white,
-                      minimumSize: const Size(double.infinity, 55),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const Network()),
-                      );
-                    },
-                    child: const Text("Monitoring Network"),
-                  ),
                   const SizedBox(height: 10),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      foregroundColor: Colors.white,
-                      minimumSize: const Size(double.infinity, 55),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const HistoryPage()),
-                      );
-                    },
-                    child: const Text("History Pemakaian"),
+                  _infoCard(
+                    icon: Icons.warning,
+                    title: "Limit Kuota",
+                    value: "Belum diatur",
                   ),
                 ],
               ),
@@ -206,7 +167,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // 🔥 WIDGET CARD BERSIH
+  // 🔥 CARD WIDGET
   Widget _infoCard({
     required IconData icon,
     required String title,
