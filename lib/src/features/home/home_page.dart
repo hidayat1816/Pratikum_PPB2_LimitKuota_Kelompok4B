@@ -37,17 +37,17 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     double total = wifiMB + mobileMB;
 
-    // 🔥 LIMIT KUOTA (sementara 10GB)
+    // LIMIT KUOTA (sementara 10GB)
     double limitMB = 10240;
 
-    // 🔥 HITUNG SISA
+    // HITUNG SISA
     double sisa = limitMB - total;
     if (sisa < 0) sisa = 0;
 
-    // 🔥 KONVERSI KE GB
+    // KONVERSI KE GB
     String sisaGB = (sisa / 1024).toStringAsFixed(2);
 
-    // 🔥 STATUS
+    //  STATUS
     double persen = (total / limitMB) * 100;
     String status;
     if (persen < 50) {
