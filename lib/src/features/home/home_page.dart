@@ -5,8 +5,6 @@ import '../../../pages/limit_setting_page.dart';
 import '../monitoring/network_page.dart';
 import '../monitoring/history_page.dart';
 import 'sidebar.dart';
-
-// 🔥 TAMBAHAN DATABASE
 import 'package:praktikum_ppb2_limitkuota_kelompok4b/src/core/data/database_helper.dart';
 
 class HomePage extends StatefulWidget {
@@ -17,110 +15,101 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<Map<String, dynamic>> data = [];
+  double wifiMB = 0;
+  double mobileMB = 0;
 
   @override
   void initState() {
     super.initState();
-    loadData();
+    loadTodayData();
   }
 
-  Future<void> loadData() async {
-    final result = await DatabaseHelper.instance.getAllData();
-    setState(() {
-      data = result;
-    });
-  }
+  Future<void> loadTodayData() async {
+    final data = await DatabaseHelper.instance.getAllData();
 
-  // 🔵 WIFI
-  List<FlSpot> getWifiData() {
-    List<FlSpot> spots = [];
+    if (data.isNotEmpty) {
+      final today = data.last;
 
-    for (int i = 0; i < data.length; i++) {
-      int wifi = data[i]['wifi'] ?? 0;
-      double mb = wifi / (1024 * 1024);
-      spots.add(FlSpot(i.toDouble(), mb));
+      setState(() {
+        wifiMB = (today['wifi'] ?? 0) / (1024 * 1024);
+        mobileMB = (today['mobile'] ?? 0) / (1024 * 1024);
+      });
     }
-
-    return spots;
-  }
-
-  // 🟢 MOBILE
-  List<FlSpot> getMobileData() {
-    List<FlSpot> spots = [];
-
-    for (int i = 0; i < data.length; i++) {
-      int mobile = data[i]['mobile'] ?? 0;
-      double mb = mobile / (1024 * 1024);
-      spots.add(FlSpot(i.toDouble(), mb));
-    }
-
-    return spots;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: const Sidebar(),
+      backgroundColor: Colors.grey[100],
 
       appBar: AppBar(
         title: const Text("Limit Kuota"),
         centerTitle: true,
+        elevation: 0,
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (_) => LimitSettingPage(),
-                ),
+                MaterialPageRoute(builder: (_) => LimitSettingPage()),
               );
             },
-          )
+          ),
         ],
       ),
 
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: data.isEmpty
-            ? const Center(child: Text("Belum ada data"))
-            : Column(
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            // 🔥 HEADER MODERN
+            Container(
+              width: double.infinity,
+              margin: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(20),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.deepPurple, Colors.blue],
+                ),
+                borderRadius: BorderRadius.all(Radius.circular(25)),
+              ),
+              child: Column(
                 children: [
-                  // 🔥 GRAFIK PINDAH KE HOME
+                  const Text(
+                    "Pemakaian Hari Ini",
+                    style: TextStyle(color: Colors.white70),
+                  ),
+                  const SizedBox(height: 15),
+
+                  // 🔥 PIE CHART BAGUS
                   SizedBox(
-                    height: 250,
-                    child: LineChart(
-                      LineChartData(
-                        borderData: FlBorderData(show: true),
-                        gridData: FlGridData(show: true),
-
-                        titlesData: FlTitlesData(
-                          leftTitles: AxisTitles(
-                            sideTitles: SideTitles(showTitles: true),
-                          ),
-                          bottomTitles: AxisTitles(
-                            sideTitles: SideTitles(showTitles: true),
-                          ),
-                        ),
-
-                        lineBarsData: [
-                          // 🔵 WIFI
-                          LineChartBarData(
-                            spots: getWifiData(),
-                            isCurved: true,
-                            barWidth: 3,
+                    height: 150,
+                    child: PieChart(
+                      PieChartData(
+                        sectionsSpace: 2,
+                        centerSpaceRadius: 40,
+                        sections: [
+                          PieChartSectionData(
+                            value: wifiMB,
                             color: Colors.blue,
-                            dotData: FlDotData(show: true),
+                            radius: 40,
+                            title: wifiMB.toStringAsFixed(0),
+                            titleStyle: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                            ),
                           ),
-
-                          // 🟢 MOBILE
-                          LineChartBarData(
-                            spots: getMobileData(),
-                            isCurved: true,
-                            barWidth: 3,
+                          PieChartSectionData(
+                            value: mobileMB,
                             color: Colors.green,
-                            dotData: FlDotData(show: true),
+                            radius: 40,
+                            // ignore: unnecessary_string_interpolations
+                            title: "${mobileMB.toStringAsFixed(0)}",
+                            titleStyle: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                            ),
                           ),
                         ],
                       ),
@@ -129,48 +118,70 @@ class _HomePageState extends State<HomePage> {
 
                   const SizedBox(height: 10),
 
-                  // 🔥 LEGEND
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Icon(Icons.circle, color: Colors.blue, size: 10),
-                      SizedBox(width: 5),
-                      Text("WiFi"),
-                      SizedBox(width: 20),
-                      Icon(Icons.circle, color: Colors.green, size: 10),
-                      SizedBox(width: 5),
-                      Text("Mobile"),
-                    ],
+                  Text(
+                    "${(wifiMB + mobileMB).toStringAsFixed(1)} MB",
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
+                ],
+              ),
+            ),
 
-                  const SizedBox(height: 20),
+            // 🔥 LEGEND
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Icon(Icons.circle, color: Colors.blue, size: 10),
+                SizedBox(width: 5),
+                Text("WiFi"),
+                SizedBox(width: 20),
+                Icon(Icons.circle, color: Colors.green, size: 10),
+                SizedBox(width: 5),
+                Text("Mobile"),
+              ],
+            ),
 
-                  // CARD KUOTA
-                  Card(
-                    elevation: 4,
-                    child: ListTile(
-                      leading: const Icon(Icons.data_usage, size: 40),
-                      title: const Text("Total Pemakaian"),
-                      subtitle: Text(
-                        "${_getTotalMB().toStringAsFixed(2)} MB",
+            const SizedBox(height: 20),
+
+            // 🔥 CARD INFO
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                children: [
+                  _infoCard(
+                    icon: Icons.data_usage,
+                    title: "Total Pemakaian",
+                    value: "${(wifiMB + mobileMB).toStringAsFixed(2)} MB",
+                  ),
+                  const SizedBox(height: 10),
+                  _infoCard(
+                    icon: Icons.network_check,
+                    title: "Status Internet",
+                    value: "Aktif",
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // 🔥 BUTTON MODERN
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                children: [
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.deepPurple,
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size(double.infinity, 55),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
                       ),
                     ),
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  Card(
-                    elevation: 4,
-                    child: const ListTile(
-                      leading: Icon(Icons.network_check, size: 40),
-                      title: Text("Status Internet"),
-                      subtitle: Text("Aktif"),
-                    ),
-                  ),
-
-                  const SizedBox(height: 30),
-
-                  ElevatedButton(
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -179,10 +190,16 @@ class _HomePageState extends State<HomePage> {
                     },
                     child: const Text("Monitoring Network"),
                   ),
-
                   const SizedBox(height: 10),
-
                   ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size(double.infinity, 55),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -193,18 +210,47 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ],
               ),
+            ),
+
+            const SizedBox(height: 30),
+          ],
+        ),
       ),
     );
   }
 
-  double _getTotalMB() {
-    double total = 0;
-
-    for (var item in data) {
-      total += ((item['wifi'] ?? 0) + (item['mobile'] ?? 0)) /
-          (1024 * 1024);
-    }
-
-    return total;
+  // 🔥 WIDGET CARD BERSIH
+  Widget _infoCard({
+    required IconData icon,
+    required String title,
+    required String value,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(15),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.shade300,
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 30, color: Colors.deepPurple),
+          const SizedBox(width: 15),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title),
+              Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 }
