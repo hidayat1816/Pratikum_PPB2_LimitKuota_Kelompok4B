@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+
+import '../../../pages/limit_setting_page.dart';
+import '../monitoring/network_page.dart';
+import '../monitoring/history_page.dart';
+import 'sidebar.dart';
+
+// 🔥 TAMBAHAN DATABASE
 import 'package:praktikum_ppb2_limitkuota_kelompok4b/src/core/data/database_helper.dart';
 
-class HistoryPage extends StatefulWidget {
-  const HistoryPage({super.key});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
   @override
-  State<HistoryPage> createState() => _HistoryPageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _HistoryPageState extends State<HistoryPage> {
+class _HomePageState extends State<HomePage> {
   List<Map<String, dynamic>> data = [];
 
   @override
@@ -25,7 +32,7 @@ class _HistoryPageState extends State<HistoryPage> {
     });
   }
 
-  // 🔵 WIFI DATA
+  // 🔵 WIFI
   List<FlSpot> getWifiData() {
     List<FlSpot> spots = [];
 
@@ -38,7 +45,7 @@ class _HistoryPageState extends State<HistoryPage> {
     return spots;
   }
 
-  // 🟢 MOBILE DATA
+  // 🟢 MOBILE
   List<FlSpot> getMobileData() {
     List<FlSpot> spots = [];
 
@@ -54,21 +61,33 @@ class _HistoryPageState extends State<HistoryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("History & Grafik")),
-      body: data.isEmpty
-          ? const Center(child: Text("Belum ada data"))
-          : Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
+      drawer: const Sidebar(),
+
+      appBar: AppBar(
+        title: const Text("Limit Kuota"),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => LimitSettingPage(),
+                ),
+              );
+            },
+          )
+        ],
+      ),
+
+      body: Padding(
+        padding: const EdgeInsets.all(20),
+        child: data.isEmpty
+            ? const Center(child: Text("Belum ada data"))
+            : Column(
                 children: [
-                  const Text(
-                    "Grafik Pemakaian Data",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // 🔥 GRAFIK 2 GARIS
+                  // 🔥 GRAFIK PINDAH KE HOME
                   SizedBox(
                     height: 250,
                     child: LineChart(
@@ -126,31 +145,66 @@ class _HistoryPageState extends State<HistoryPage> {
 
                   const SizedBox(height: 20),
 
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: data.length,
-                      itemBuilder: (context, index) {
-                        final item = data[index];
-
-                        double totalMB =
-                            ((item['wifi'] ?? 0) +
-                                (item['mobile'] ?? 0)) /
-                            (1024 * 1024);
-
-                        return Card(
-                          child: ListTile(
-                            title: Text(item['date']),
-                            subtitle: Text(
-                              "${totalMB.toStringAsFixed(2)} MB",
-                            ),
-                          ),
-                        );
-                      },
+                  // CARD KUOTA
+                  Card(
+                    elevation: 4,
+                    child: ListTile(
+                      leading: const Icon(Icons.data_usage, size: 40),
+                      title: const Text("Total Pemakaian"),
+                      subtitle: Text(
+                        "${_getTotalMB().toStringAsFixed(2)} MB",
+                      ),
                     ),
-                  )
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  Card(
+                    elevation: 4,
+                    child: const ListTile(
+                      leading: Icon(Icons.network_check, size: 40),
+                      title: Text("Status Internet"),
+                      subtitle: Text("Aktif"),
+                    ),
+                  ),
+
+                  const SizedBox(height: 30),
+
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const Network()),
+                      );
+                    },
+                    child: const Text("Monitoring Network"),
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const HistoryPage()),
+                      );
+                    },
+                    child: const Text("History Pemakaian"),
+                  ),
                 ],
               ),
-            ),
+      ),
     );
+  }
+
+  double _getTotalMB() {
+    double total = 0;
+
+    for (var item in data) {
+      total += ((item['wifi'] ?? 0) + (item['mobile'] ?? 0)) /
+          (1024 * 1024);
+    }
+
+    return total;
   }
 }
