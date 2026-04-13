@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Limit Kuota',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: HomePage(),
+      home: const HomePage(),
     );
   }
 }
