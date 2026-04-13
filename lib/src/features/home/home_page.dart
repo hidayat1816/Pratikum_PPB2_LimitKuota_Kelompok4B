@@ -37,6 +37,27 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     double total = wifiMB + mobileMB;
 
+    // 🔥 LIMIT KUOTA (sementara 10GB)
+    double limitMB = 10240;
+
+    // 🔥 HITUNG SISA
+    double sisa = limitMB - total;
+    if (sisa < 0) sisa = 0;
+
+    // 🔥 KONVERSI KE GB
+    String sisaGB = (sisa / 1024).toStringAsFixed(2);
+
+    // 🔥 STATUS
+    double persen = (total / limitMB) * 100;
+    String status;
+    if (persen < 50) {
+      status = "Aman";
+    } else if (persen < 80) {
+      status = "Waspada";
+    } else {
+      status = "Hampir Habis";
+    }
+
     return Scaffold(
       drawer: const Sidebar(),
       backgroundColor: Colors.grey[100],
@@ -51,8 +72,7 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-        
-            // 🔥 HEADER MODERN + CHART
+            // 🔥 HEADER + CHART
             Container(
               width: double.infinity,
               margin: const EdgeInsets.all(16),
@@ -117,6 +137,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
 
+            // 🔥 LEGEND
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: const [
@@ -132,7 +153,7 @@ class _HomePageState extends State<HomePage> {
 
             const SizedBox(height: 20),
 
-            //  CARD INFO
+            // 🔥 CARD INFO
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
@@ -152,7 +173,19 @@ class _HomePageState extends State<HomePage> {
                   _infoCard(
                     icon: Icons.warning,
                     title: "Limit Kuota",
-                    value: "Belum diatur",
+                    value: "10 GB",
+                  ),
+                  const SizedBox(height: 10),
+                  _infoCard(
+                    icon: Icons.signal_cellular_alt,
+                    title: "Sisa Kuota",
+                    value: "$sisaGB GB",
+                  ),
+                  const SizedBox(height: 10),
+                  _infoCard(
+                    icon: Icons.info,
+                    title: "Status",
+                    value: status,
                   ),
                 ],
               ),
@@ -165,7 +198,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  //  CARD WIDGET
+  // 🔥 CARD WIDGET
   Widget _infoCard({
     required IconData icon,
     required String title,
