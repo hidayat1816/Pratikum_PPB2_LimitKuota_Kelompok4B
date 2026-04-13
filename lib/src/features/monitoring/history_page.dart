@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:praktikum_ppb2_limitkuota_kelompok4b/src/core/data/database_helper.dart';
 
 class HistoryPage extends StatefulWidget {
@@ -9,167 +10,108 @@ class HistoryPage extends StatefulWidget {
 }
 
 class _HistoryPageState extends State<HistoryPage> {
-  late Future<List<Map<String, dynamic>>> _historyList;
+  List<Map<String, dynamic>> data = [];
 
   @override
   void initState() {
     super.initState();
-    _refreshHistory();
+    loadData();
   }
 
-  void _refreshHistory() {
-    _historyList = DatabaseHelper.instance.getHistory();
+  Future<void> loadData() async {
+    final result = await DatabaseHelper.instance.getAllData();
+    setState(() {
+      data = result;
+    });
   }
 
-  String _formatBytes(int bytes) {
-    if (bytes <= 0) return "0.00 MB";
-    double mb = bytes / (1024 * 1024);
-    if (mb > 1024) {
-      return "${(mb / 1024).toStringAsFixed(2)} GB";
+  List<FlSpot> getChartData() {
+    List<FlSpot> spots = [];
+
+    for (int i = 0; i < data.length; i++) {
+      int wifi = data[i]['wifi'] ?? 0;
+      int mobile = data[i]['mobile'] ?? 0;
+
+      double totalMB = (wifi + mobile) / (1024 * 1024);
+
+      spots.add(FlSpot(i.toDouble(), totalMB));
     }
-    return "${mb.toStringAsFixed(2)} MB";
+
+    return spots;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
-
-      appBar: AppBar(
-        title: const Text("Riwayat Penggunaan"),
-        centerTitle: true,
-        backgroundColor: Colors.blue,
-        elevation: 0,
-      ),
-
-      body: FutureBuilder<List<Map<String, dynamic>>>(
-        future: _historyList,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (snapshot.hasError) {
-            return Center(child: Text("Error: ${snapshot.error}"));
-          }
-
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(
+      appBar: AppBar(title: const Text("History & Grafik")),
+      body: data.isEmpty
+          ? const Center(child: Text("Belum ada data"))
+          : Padding(
+              padding: const EdgeInsets.all(16),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  Icon(Icons.history, size: 80, color: Colors.grey),
-                  SizedBox(height: 10),
-                  Text(
-                    "Belum ada riwayat data",
-                    style: TextStyle(fontSize: 18),
+                children: [
+                  const Text(
+                    "Grafik Pemakaian Data (MB)",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
-                ],
-              ),
-            );
-          }
 
-          final data = snapshot.data!;
+                  const SizedBox(height: 20),
 
-          return ListView.builder(
-            padding: const EdgeInsets.all(12),
-            itemCount: data.length,
-            itemBuilder: (context, index) {
-              final item = data[index];
+                  SizedBox(
+                    height: 250,
+                    child: LineChart(
+                      LineChartData(
+                        borderData: FlBorderData(show: true),
+                        gridData: FlGridData(show: true),
 
-              return Container(
-                margin: const EdgeInsets.only(bottom: 12),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(15),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.shade300,
-                      blurRadius: 6,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(15),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // tanggal
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.calendar_today,
-                            color: Colors.blue,
-                            size: 20,
+                        titlesData: FlTitlesData(
+                          leftTitles: AxisTitles(
+                            sideTitles: SideTitles(showTitles: true),
                           ),
-                          const SizedBox(width: 8),
-                          Text(
-                            item['date'],
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
+                          bottomTitles: AxisTitles(
+                            sideTitles: SideTitles(showTitles: true),
+                          ),
+                        ),
+
+                        lineBarsData: [
+                          LineChartBarData(
+                            spots: getChartData(),
+                            isCurved: true,
+                            barWidth: 3,
+                            dotData: FlDotData(show: true),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: data.length,
+                      itemBuilder: (context, index) {
+                        final item = data[index];
+
+                        double totalMB =
+                            ((item['wifi'] ?? 0) +
+                                (item['mobile'] ?? 0)) /
+                            (1024 * 1024);
+
+                        return Card(
+                          child: ListTile(
+                            title: Text(item['date']),
+                            subtitle: Text(
+                              "${totalMB.toStringAsFixed(2)} MB",
                             ),
                           ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 15),
-
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          // wifi
-                          _usageBox(
-                            "WiFi",
-                            _formatBytes(item['wifi']),
-                            Icons.wifi,
-                            Colors.blue,
-                          ),
-
-                          // mobile
-                          _usageBox(
-                            "Mobile",
-                            _formatBytes(item['mobile']),
-                            Icons.signal_cellular_alt,
-                            Colors.green,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _usageBox(String title, String value, IconData icon, Color color) {
-    return Container(
-      width: 140,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: color),
-          const SizedBox(height: 5),
-          Text(
-            title,
-            style: TextStyle(fontWeight: FontWeight.bold, color: color),
-          ),
-          const SizedBox(height: 5),
-          Text(
-            value,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-        ],
-      ),
+                        );
+                      },
+                    ),
+                  )
+                ],
+              ),
+            ),
     );
   }
 }
