@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-
-import '../../../pages/limit_setting_page.dart';
 import '../monitoring/network_page.dart';
 import '../monitoring/history_page.dart';
 import 'sidebar.dart';
@@ -47,17 +45,6 @@ class _HomePageState extends State<HomePage> {
         title: const Text("Limit Kuota"),
         centerTitle: true,
         elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => LimitSettingPage()),
-              );
-            },
-          ),
-        ],
       ),
 
       body: SingleChildScrollView(
