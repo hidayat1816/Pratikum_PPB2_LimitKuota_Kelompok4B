@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../monitoring/network_page.dart';
 import '../monitoring/history_page.dart';
-import 'home_page.dart';
 
 class Sidebar extends StatelessWidget {
   const Sidebar({super.key});
@@ -27,23 +26,12 @@ class Sidebar extends StatelessWidget {
           ),
 
           ListTile(
-            leading: const Icon(Icons.home),
-            title: const Text("Home"),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const HomePage()),
-              );
-            },
-          ),
-
-          ListTile(
             leading: const Icon(Icons.network_check),
             title: const Text("Monitoring"),
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const Network()),
+                MaterialPageRoute(builder: (_) => const Network()),
               );
             },
           ),
@@ -54,7 +42,7 @@ class Sidebar extends StatelessWidget {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const HistoryPage()),
+                MaterialPageRoute(builder: (_) => const HistoryPage()),
               );
             },
           ),
