@@ -231,6 +231,6 @@ class _NetworkState extends State<Network> {
         title: const Text("Izin Diperlukan"),
         content: const Text("Aktifkan akses penggunaan."),
       ),
-    );
+      );
   }
 }
