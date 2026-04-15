@@ -47,17 +47,6 @@ class _HomePageState extends State<HomePage> {
     // KONVERSI KE GB
     String sisaGB = (sisa / 1024).toStringAsFixed(2);
 
-    //  STATUS
-    double persen = (total / limitMB) * 100;
-    String status;
-    if (persen < 50) {
-      status = "Aman";
-    } else if (persen < 80) {
-      status = "Waspada";
-    } else {
-      status = "Hampir Habis";
-    }
-
     return Scaffold(
       drawer: const Sidebar(),
       backgroundColor: Colors.grey[100],
@@ -181,12 +170,6 @@ class _HomePageState extends State<HomePage> {
                     title: "Sisa Kuota",
                     value: "$sisaGB GB",
                   ),
-                  const SizedBox(height: 10),
-                  _infoCard(
-                    icon: Icons.info,
-                    title: "Status",
-                    value: status,
-                  ),
                 ],
               ),
             ),
@@ -198,7 +181,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // 🔥 CARD WIDGET
   Widget _infoCard({
     required IconData icon,
     required String title,
