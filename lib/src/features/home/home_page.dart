@@ -3,6 +3,9 @@ import 'package:fl_chart/fl_chart.dart';
 import 'sidebar.dart';
 import 'package:praktikum_ppb2_limitkuota_kelompok4b/src/core/data/database_helper.dart';
 
+// 🔥 TAMBAHAN
+import '../../core/services/notification_service.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -14,10 +17,20 @@ class _HomePageState extends State<HomePage> {
   double wifiMB = 0;
   double mobileMB = 0;
 
+  // 🔥 DARK MODE STATE
+  bool isDarkMode = false;
+
   @override
   void initState() {
     super.initState();
     loadTodayData();
+
+    // 🔥 AUTO REFRESH
+    Future.doWhile(() async {
+      await Future.delayed(const Duration(seconds: 10));
+      await loadTodayData();
+      return true;
+    });
   }
 
   Future<void> loadTodayData() async {
@@ -26,9 +39,23 @@ class _HomePageState extends State<HomePage> {
     if (data.isNotEmpty) {
       final today = data.last;
 
+      double wifi = (today['wifi'] ?? 0) / (1024 * 1024);
+      double mobile = (today['mobile'] ?? 0) / (1024 * 1024);
+
+      double total = wifi + mobile;
+
+      double limitMB = 3000;
+
+      // 🔥 NOTIF
+      NotificationService.checkUsage(
+        usedMB: total,
+        limitMB: limitMB,
+        context: context,
+      );
+
       setState(() {
-        wifiMB = (today['wifi'] ?? 0) / (1024 * 1024);
-        mobileMB = (today['mobile'] ?? 0) / (1024 * 1024);
+        wifiMB = wifi;
+        mobileMB = mobile;
       });
     }
   }
@@ -37,24 +64,38 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     double total = wifiMB + mobileMB;
 
-    // LIMIT KUOTA (sementara 10GB)
     double limitMB = 10240;
 
-    // HITUNG SISA
+    double percent = total / limitMB;
+    Color usageColor = getUsageColor(percent);
+
     double sisa = limitMB - total;
     if (sisa < 0) sisa = 0;
 
-    // KONVERSI KE GB
     String sisaGB = (sisa / 1024).toStringAsFixed(2);
 
     return Scaffold(
       drawer: const Sidebar(),
-      backgroundColor: Colors.grey[100],
+
+      // 🔥 BACKGROUND DARK MODE
+      backgroundColor: isDarkMode ? Colors.black : Colors.grey[100],
 
       appBar: AppBar(
         title: const Text("Limit Kuota"),
         centerTitle: true,
         elevation: 0,
+
+        // 🔥 ICON DARK MODE
+        actions: [
+          IconButton(
+            icon: Icon(isDarkMode ? Icons.light_mode : Icons.dark_mode),
+            onPressed: () {
+              setState(() {
+                isDarkMode = !isDarkMode;
+              });
+            },
+          ),
+        ],
       ),
 
       body: SingleChildScrollView(
@@ -116,11 +157,27 @@ class _HomePageState extends State<HomePage> {
 
                   Text(
                     "${total.toStringAsFixed(1)} MB",
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: usageColor,
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  LinearProgressIndicator(
+                    value: percent.clamp(0.0, 1.0),
+                    minHeight: 8,
+                    backgroundColor: Colors.white30,
+                    valueColor: AlwaysStoppedAnimation<Color>(usageColor),
+                  ),
+
+                  const SizedBox(height: 5),
+
+                  Text(
+                    "${(percent * 100).toStringAsFixed(1)}% digunakan",
+                    style: const TextStyle(color: Colors.white70),
                   ),
                 ],
               ),
@@ -129,14 +186,24 @@ class _HomePageState extends State<HomePage> {
             // 🔥 LEGEND
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                Icon(Icons.circle, color: Colors.blue, size: 10),
-                SizedBox(width: 5),
-                Text("WiFi"),
-                SizedBox(width: 20),
-                Icon(Icons.circle, color: Colors.green, size: 10),
-                SizedBox(width: 5),
-                Text("Mobile"),
+              children: [
+                const Icon(Icons.circle, color: Colors.blue, size: 10),
+                const SizedBox(width: 5),
+                Text(
+                  "WiFi",
+                  style: TextStyle(
+                    color: isDarkMode ? Colors.white : Colors.black,
+                  ),
+                ),
+                const SizedBox(width: 20),
+                const Icon(Icons.circle, color: Colors.green, size: 10),
+                const SizedBox(width: 5),
+                Text(
+                  "Mobile",
+                  style: TextStyle(
+                    color: isDarkMode ? Colors.white : Colors.black,
+                  ),
+                ),
               ],
             ),
 
@@ -181,6 +248,13 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  // 🔥 FUNCTION WARNA
+  Color getUsageColor(double percent) {
+    if (percent >= 1.0) return Colors.red;
+    if (percent >= 0.8) return Colors.orange;
+    return Colors.green;
+  }
+
   Widget _infoCard({
     required IconData icon,
     required String title,
@@ -189,7 +263,9 @@ class _HomePageState extends State<HomePage> {
     return Container(
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDarkMode
+            ? Colors.grey[900]
+            : Colors.white, // 🔥 DARK MODE CARD
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
@@ -206,8 +282,19 @@ class _HomePageState extends State<HomePage> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title),
-              Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
+              Text(
+                title,
+                style: TextStyle(
+                  color: isDarkMode ? Colors.white : Colors.black,
+                ),
+              ),
+              Text(
+                value,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.black,
+                ),
+              ),
             ],
           ),
         ],
