@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:praktikum_ppb2_limitkuota_kelompok4b/pages/profile_page.dart';
 import '../monitoring/network_page.dart';
 import '../monitoring/history_page.dart';
 import '../../../pages/limit_setting_page.dart';
+// ignore: duplicate_import
+import '../../../pages/profile_page.dart'; // 
 
 class Sidebar extends StatelessWidget {
   const Sidebar({super.key});
@@ -32,14 +35,27 @@ class Sidebar extends StatelessWidget {
                   "User",
                   style: TextStyle(color: Colors.white, fontSize: 18),
                 ),
-                Text("user@email.com", style: TextStyle(color: Colors.white70)),
+                Text("user@email.com",
+                    style: TextStyle(color: Colors.white70)),
               ],
             ),
           ),
 
           const SizedBox(height: 10),
 
-          // 🔥 MENU
+          // 🔥 MENU PROFIL (BARU)
+          ListTile(
+            leading: const Icon(Icons.person),
+            title: const Text("Profil"),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ProfilePage()),
+              );
+            },
+          ),
+
+          // 🔥 MENU LAINNYA
           ListTile(
             leading: const Icon(Icons.network_check),
             title: const Text("Monitoring"),
@@ -64,14 +80,14 @@ class Sidebar extends StatelessWidget {
 
           const Divider(),
 
-          // 🔥 SETTINGS PINDAH KE SINI
+          // 🔥 SETTINGS
           ListTile(
             leading: const Icon(Icons.settings),
             title: const Text("Pengaturan Kuota"),
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => LimitSettingPage()),
+                MaterialPageRoute(builder: (_) => const LimitSettingPage()),
               );
             },
           ),
