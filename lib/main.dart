@@ -6,7 +6,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await NotificationService.init(); // 🔥 WAJIB
-
+  
+  
   runApp(MyApp());
 }
 
