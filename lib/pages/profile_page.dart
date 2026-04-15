@@ -39,7 +39,7 @@ class ProfilePage extends StatelessWidget {
               // 🔥 FOTO PROFIL
               const CircleAvatar(
                 radius: 50,
-                backgroundImage: AssetImage("assets/profile.jpg"), 
+                backgroundImage: AssetImage("assets/images/profile.jpg.jpeg"), 
                 // kalau belum ada gambar, bisa pakai:
                 // child: Icon(Icons.person, size: 50),
               ),
