@@ -50,6 +50,7 @@ class _HomePageState extends State<HomePage> {
       NotificationService.checkUsage(
         usedMB: total,
         limitMB: limitMB,
+        // ignore: use_build_context_synchronously
         context: context,
       );
 
