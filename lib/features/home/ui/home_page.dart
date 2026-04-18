@@ -18,7 +18,6 @@ class _HomePageState extends State<HomePage> {
   double mobileMB = 0;
 
   bool isDarkMode = false;
-
   Timer? _timer;
 
   @override
@@ -39,17 +38,16 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _loadData() async {
     final data = await DatabaseHelper.instance.getAllData();
-
     if (!mounted) return;
 
     if (data.isNotEmpty) {
       final today = data.last;
 
-      double wifi = (today['wifi'] ?? 0) / (1024 * 1024);
-      double mobile = (today['mobile'] ?? 0) / (1024 * 1024);
+      final wifi = (today['wifi'] ?? 0) / (1024 * 1024);
+      final mobile = (today['mobile'] ?? 0) / (1024 * 1024);
 
-      double total = wifi + mobile;
-      double limitMB = 3000;
+      final total = wifi + mobile;
+      const double limitMB = 3000;
 
       NotificationService.checkUsage(
         usedMB: total,
@@ -67,7 +65,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final total = wifiMB + mobileMB;
-    final limitMB = 10240;
+    const limitMB = 10240;
 
     final percent = total / limitMB;
     final usageColor = _getUsageColor(percent);
@@ -79,20 +77,22 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       drawer: const Sidebar(),
-      backgroundColor: isDarkMode ? Colors.black : Colors.grey[100],
+      backgroundColor: isDarkMode
+          ? const Color(0xFF0F1115)
+          : const Color(0xFFF5F7FB),
 
       appBar: AppBar(
         title: const Text("Limit Kuota"),
         centerTitle: true,
         elevation: 0,
+        backgroundColor: isDarkMode
+            ? const Color(0xFF0F1115)
+            : const Color(0xFFF5F7FB),
+        foregroundColor: isDarkMode ? Colors.white : Colors.black,
         actions: [
           IconButton(
             icon: Icon(isDarkMode ? Icons.light_mode : Icons.dark_mode),
-            onPressed: () {
-              setState(() {
-                isDarkMode = !isDarkMode;
-              });
-            },
+            onPressed: () => setState(() => isDarkMode = !isDarkMode),
           ),
         ],
       ),
@@ -100,42 +100,73 @@ class _HomePageState extends State<HomePage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // 🔥 USAGE CARD (SUDAH DIPISAH)
+            // 🔥 HEADER (NEW)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Halo 👋",
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: isDarkMode ? Colors.white70 : Colors.black54,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          "Pantau Kuotamu Hari Ini",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: isDarkMode ? Colors.white : Colors.black,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  _StatusChip(percent: percent),
+                ],
+              ),
+            ),
+
+            // 🔥 USAGE CARD (UPGRADED)
             UsageCard(
               wifiMB: wifiMB,
               mobileMB: mobileMB,
               total: total,
               percent: percent,
               usageColor: usageColor,
+              isDarkMode: isDarkMode,
             ),
 
             // 🔥 LEGEND
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.circle, color: Colors.blue, size: 10),
-                const SizedBox(width: 5),
-                Text(
-                  "WiFi",
-                  style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+            Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _LegendDot(
+                    color: Colors.blue,
+                    label: "WiFi",
+                    isDark: isDarkMode,
                   ),
-                ),
-                const SizedBox(width: 20),
-                const Icon(Icons.circle, color: Colors.green, size: 10),
-                const SizedBox(width: 5),
-                Text(
-                  "Mobile",
-                  style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                  const SizedBox(width: 16),
+                  _LegendDot(
+                    color: Colors.green,
+                    label: "Mobile",
+                    isDark: isDarkMode,
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
 
-            // 🔥 INFO CARD (SUDAH DIPISAH)
+            // 🔥 INFO CARDS
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
@@ -147,7 +178,6 @@ class _HomePageState extends State<HomePage> {
                     isDarkMode: isDarkMode,
                   ),
                   const SizedBox(height: 10),
-
                   InfoCard(
                     icon: Icons.network_check,
                     title: "Status Internet",
@@ -155,7 +185,6 @@ class _HomePageState extends State<HomePage> {
                     isDarkMode: isDarkMode,
                   ),
                   const SizedBox(height: 10),
-
                   InfoCard(
                     icon: Icons.warning,
                     title: "Limit Kuota",
@@ -163,7 +192,6 @@ class _HomePageState extends State<HomePage> {
                     isDarkMode: isDarkMode,
                   ),
                   const SizedBox(height: 10),
-
                   InfoCard(
                     icon: Icons.signal_cellular_alt,
                     title: "Sisa Kuota",
@@ -185,5 +213,67 @@ class _HomePageState extends State<HomePage> {
     if (percent >= 1.0) return Colors.red;
     if (percent >= 0.8) return Colors.orange;
     return Colors.green;
+  }
+}
+
+// 🔥 STATUS CHIP
+class _StatusChip extends StatelessWidget {
+  final double percent;
+  const _StatusChip({required this.percent});
+
+  @override
+  Widget build(BuildContext context) {
+    String text;
+    Color color;
+
+    if (percent >= 1) {
+      text = "Habis";
+      color = Colors.red;
+    } else if (percent >= 0.8) {
+      text = "Hampir Habis";
+      color = Colors.orange;
+    } else {
+      text = "Aman";
+      color = Colors.green;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(color: color, fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+}
+
+// 🔥 LEGEND
+class _LegendDot extends StatelessWidget {
+  final Color color;
+  final String label;
+  final bool isDark;
+
+  const _LegendDot({
+    required this.color,
+    required this.label,
+    required this.isDark,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(Icons.circle, color: color, size: 10),
+        const SizedBox(width: 6),
+        Text(
+          label,
+          style: TextStyle(color: isDark ? Colors.white : Colors.black),
+        ),
+      ],
+    );
   }
 }
