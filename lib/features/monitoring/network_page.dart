@@ -12,24 +12,36 @@ class Network extends StatefulWidget {
 
   @override
   State<Network> createState() => _NetworkState();
+
+  // 🔥 TAMBAHAN BARU (INI KUNCI FIX KAMU)
+  static const platform = MethodChannel('limit_kuota/channel');
+
+  static Future<Map<String, int>> getUsage() async {
+    final Map<dynamic, dynamic> result =
+        await platform.invokeMethod('getTodayUsage');
+
+    int wifiBytes = result['wifi'] ?? 0;
+    int mobileBytes = result['mobile'] ?? 0;
+
+    return {
+      "wifi": wifiBytes,
+      "mobile": mobileBytes,
+    };
+  }
 }
 
 class _NetworkState extends State<Network> {
-  static const platform = MethodChannel('limit_kuota/channel');
-
   String wifiUsage = "0.00 MB";
   String mobileUsage = "0.00 MB";
 
   Future<void> fetchUsage() async {
     try {
-      final Map<dynamic, dynamic> result = await platform.invokeMethod(
-        'getTodayUsage',
-      );
+      final usage = await Network.getUsage(); // 🔥 PAKAI FUNCTION BARU
 
       String todayDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
 
-      int wifiBytes = result['wifi'] ?? 0;
-      int mobileBytes = result['mobile'] ?? 0;
+      int wifiBytes = usage['wifi']!;
+      int mobileBytes = usage['mobile']!;
 
       await DatabaseHelper.instance.insertOrUpdate(
         todayDate,
@@ -42,7 +54,6 @@ class _NetworkState extends State<Network> {
         mobileUsage = _formatBytes(mobileBytes);
       });
 
-      // 🔥 SUDAH PAKAI AWAIT
       await checkLimitAndWarn(wifiBytes + mobileBytes);
 
     } on PlatformException catch (e) {
@@ -61,13 +72,11 @@ class _NetworkState extends State<Network> {
     return "${mb.toStringAsFixed(2)} MB";
   }
 
-  // 🔥 UPDATED: ADA NOTIFIKASI
   Future<void> checkLimitAndWarn(int currentUsage) async {
     int limitInBytes = await LimitService.getLimit();
 
     double percent = currentUsage / limitInBytes;
 
-    // 🔔 80% WARNING
     if (percent >= 0.8 && percent < 1.0) {
       await NotificationService.showNotification(
         "Peringatan Kuota",
@@ -75,7 +84,6 @@ class _NetworkState extends State<Network> {
       );
     }
 
-    // 🚨 100% HABIS
     if (currentUsage >= limitInBytes) {
       await NotificationService.showNotification(
         "Kuota Habis!",
@@ -83,7 +91,6 @@ class _NetworkState extends State<Network> {
       );
 
       showDialog(
-        // ignore: use_build_context_synchronously
         context: context,
         builder: (context) => AlertDialog(
           title: const Text("Batas Kuota Tercapai!"),
@@ -207,7 +214,6 @@ class _NetworkState extends State<Network> {
         children: [
           CircleAvatar(
             radius: 25,
-            // ignore: deprecated_member_use
             backgroundColor: color.withOpacity(0.1),
             child: Icon(icon, color: color),
           ),
@@ -227,10 +233,10 @@ class _NetworkState extends State<Network> {
   void _showPermissionDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Izin Diperlukan"),
-        content: const Text("Aktifkan akses penggunaan."),
+      builder: (context) => const AlertDialog(
+        title: Text("Izin Diperlukan"),
+        content: Text("Aktifkan akses penggunaan."),
       ),
-      );
+    );
   }
 }
