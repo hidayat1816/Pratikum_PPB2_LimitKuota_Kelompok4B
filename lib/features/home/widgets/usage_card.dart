@@ -7,6 +7,7 @@ class UsageCard extends StatelessWidget {
   final double total;
   final double percent;
   final Color usageColor;
+  final bool isDarkMode; // 🔥 TAMBAHAN
 
   const UsageCard({
     super.key,
@@ -15,6 +16,7 @@ class UsageCard extends StatelessWidget {
     required this.total,
     required this.percent,
     required this.usageColor,
+    required this.isDarkMode, // 🔥 TAMBAHAN
   });
 
   @override
@@ -23,31 +25,43 @@ class UsageCard extends StatelessWidget {
       width: double.infinity,
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(20),
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.deepPurple, Colors.blue],
+
+      // 🔥 GRADIENT + SHADOW (UPGRADE)
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF6A5AE0), Color(0xFF2F80ED)],
         ),
-        borderRadius: BorderRadius.all(Radius.circular(25)),
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.15),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
       ),
+
       child: Column(
         children: [
           const Text(
             "Pemakaian Hari Ini",
             style: TextStyle(color: Colors.white70),
           ),
+
           const SizedBox(height: 15),
 
+          // 🔥 PIE CHART
           SizedBox(
             height: 150,
             child: PieChart(
               PieChartData(
                 sectionsSpace: 2,
-                centerSpaceRadius: 40,
+                centerSpaceRadius: 45,
                 sections: [
                   PieChartSectionData(
                     value: wifiMB,
                     color: Colors.blue,
-                    radius: 40,
+                    radius: 45,
                     title: wifiMB.toStringAsFixed(0),
                     titleStyle: const TextStyle(
                       color: Colors.white,
@@ -57,7 +71,7 @@ class UsageCard extends StatelessWidget {
                   PieChartSectionData(
                     value: mobileMB,
                     color: Colors.green,
-                    radius: 40,
+                    radius: 45,
                     title: mobileMB.toStringAsFixed(0),
                     titleStyle: const TextStyle(
                       color: Colors.white,
@@ -69,31 +83,51 @@ class UsageCard extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
 
+          // 🔥 ANGKA BESAR (DITINGKATKAN)
           Text(
             "${total.toStringAsFixed(1)} MB",
             style: TextStyle(
               color: usageColor,
-              fontSize: 20,
+              fontSize: 26, // 🔥 LEBIH BESAR
               fontWeight: FontWeight.bold,
             ),
           ),
 
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
 
-          LinearProgressIndicator(
-            value: percent.clamp(0.0, 1.0),
-            minHeight: 8,
-            backgroundColor: Colors.white30,
-            valueColor: AlwaysStoppedAnimation<Color>(usageColor),
+          // 🔥 PROGRESS BAR LEBIH HALUS
+          ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: LinearProgressIndicator(
+              value: percent.clamp(0.0, 1.0),
+              minHeight: 10,
+              backgroundColor: Colors.white24,
+              valueColor: AlwaysStoppedAnimation<Color>(usageColor),
+            ),
           ),
 
-          const SizedBox(height: 5),
+          const SizedBox(height: 8),
 
+          // 🔥 PERSENTASE + STATUS
           Text(
             "${(percent * 100).toStringAsFixed(1)}% digunakan",
             style: const TextStyle(color: Colors.white70),
+          ),
+
+          const SizedBox(height: 6),
+
+          Text(
+            percent >= 1
+                ? "Kuota Habis"
+                : percent >= 0.8
+                    ? "Hampir Habis"
+                    : "Aman",
+            style: TextStyle(
+              color: usageColor,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ],
       ),
