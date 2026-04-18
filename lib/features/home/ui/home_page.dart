@@ -1,3 +1,5 @@
+// ignore_for_file: unused_local_variable, unused_import
+
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../core/data/database_helper.dart';
@@ -5,6 +7,7 @@ import '../../../core/services/notification_service.dart';
 import '../widgets/usage_card.dart';
 import '../widgets/info_card.dart';
 import 'sidebar.dart';
+import '../../monitoring/network_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -37,29 +40,30 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _loadData() async {
-    final data = await DatabaseHelper.instance.getAllData();
+    final usage = await Network.getUsage();
+
+    final wifiBytes = usage["wifi"]!;
+    final mobileBytes = usage["mobile"]!;
+
+    final wifi = wifiBytes / (1024 * 1024);
+    final mobile = mobileBytes / (1024 * 1024);
+
+    final total = wifi + mobile;
+
+    // 🔥 SIMPAN KE DATABASE
+    await DatabaseHelper.instance.insertOrUpdate(
+      DateTime.now().toString().substring(0, 10),
+      wifiBytes,
+      mobileBytes,
+    );
+
     if (!mounted) return;
 
-    if (data.isNotEmpty) {
-      final today = data.last;
-
-      final wifi = (today['wifi'] ?? 0) / (1024 * 1024);
-      final mobile = (today['mobile'] ?? 0) / (1024 * 1024);
-
-      final total = wifi + mobile;
-      const double limitMB = 3000;
-
-      NotificationService.checkUsage(
-        usedMB: total,
-        limitMB: limitMB,
-        context: context,
-      );
-
-      setState(() {
-        wifiMB = wifi;
-        mobileMB = mobile;
-      });
-    }
+    setState(() {
+      wifiMB = wifi;
+      mobileMB = mobile;
+      var isLoading = false;
+    });
   }
 
   @override
