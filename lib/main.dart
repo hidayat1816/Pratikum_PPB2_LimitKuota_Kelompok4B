@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'src/core/services/notification_service.dart';
-import 'src/features/home/home_page.dart';
+import 'core/services/notification_service.dart';
+import 'features/home/ui/home_page.dart';
+// ignore: unused_import
+import 'features/home/ui/sidebar.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
