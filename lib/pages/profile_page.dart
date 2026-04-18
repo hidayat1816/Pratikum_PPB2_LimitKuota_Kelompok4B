@@ -1,7 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+
+  String nama = "Julita";
+  String email = "julitajulita715@gmail.com";
+  String password = "12345678";
+  String status = "Aktif";
+
+  // 🔥 TAMBAHAN FOTO
+  File? _image;
+  final ImagePicker _picker = ImagePicker();
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +31,6 @@ class ProfilePage extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-
       backgroundColor: Colors.grey[100],
 
       body: Center(
@@ -36,35 +52,35 @@ class ProfilePage extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // 🔥 FOTO PROFIL
-              const CircleAvatar(
-                radius: 50,
-                backgroundImage: AssetImage("assets/images/profile.jpg.jpeg"), 
-                // kalau belum ada gambar, bisa pakai:
-                // child: Icon(Icons.person, size: 50),
+
+              // 🔥 FOTO PROFIL (SUDAH BISA DIKLIK)
+              GestureDetector(
+                onTap: _showImageSourceDialog,
+                child: CircleAvatar(
+                  radius: 50,
+                  backgroundColor: Colors.grey[300],
+                  backgroundImage:
+                      _image != null ? FileImage(_image!) : null,
+                  child: _image == null
+                      ? const Icon(Icons.person, size: 40)
+                      : null,
+                ),
               ),
 
               const SizedBox(height: 15),
 
-              // DATA PROFIL
-              _buildField("Nama Lengkap", "Julita"),
-              _buildField("Email", "julitajulita715@gmail.com"),
-              _buildField("Password", "12345678"),
-              _buildField("Status", "Aktif"),
+              _buildField("Nama Lengkap", nama),
+              _buildField("Email", email),
+              _buildField("Password", password),
+              _buildField("Status", status),
 
               const SizedBox(height: 15),
 
-              // 🔥 BUTTON EDIT
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.teal,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
                 ),
-                onPressed: () {
-                  // nanti bisa diarahkan ke edit profile
-                },
+                onPressed: _showEditDialog,
                 icon: const Icon(Icons.edit),
                 label: const Text("Edit Profil"),
               )
@@ -75,7 +91,115 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  // 🔧 WIDGET FIELD
+  // 🔥 PILIH FOTO
+  Future<void> _pickImage(ImageSource source) async {
+    final pickedFile = await _picker.pickImage(source: source);
+
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+      });
+    }
+  }
+
+  // 🔥 DIALOG PILIH KAMERA / GALERI
+  void _showImageSourceDialog() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Wrap(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text("Kamera"),
+              onTap: () {
+                Navigator.pop(context);
+                _pickImage(ImageSource.camera);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo),
+              title: const Text("Galeri"),
+              onTap: () {
+                Navigator.pop(context);
+                _pickImage(ImageSource.gallery);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // 🔥 DIALOG EDIT PROFIL (SUDAH ADA FOTO)
+  void _showEditDialog() {
+    TextEditingController namaCtrl = TextEditingController(text: nama);
+    TextEditingController emailCtrl = TextEditingController(text: email);
+    TextEditingController passwordCtrl = TextEditingController(text: password);
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Edit Profil"),
+          content: SingleChildScrollView(
+            child: Column(
+              children: [
+
+                // FOTO DI DALAM EDIT
+                GestureDetector(
+                  onTap: _showImageSourceDialog,
+                  child: CircleAvatar(
+                    radius: 40,
+                    backgroundColor: Colors.grey[300],
+                    backgroundImage:
+                        _image != null ? FileImage(_image!) : null,
+                    child: _image == null
+                        ? const Icon(Icons.camera_alt)
+                        : null,
+                  ),
+                ),
+
+                const SizedBox(height: 15),
+
+                TextField(
+                  controller: namaCtrl,
+                  decoration: const InputDecoration(labelText: "Nama"),
+                ),
+                TextField(
+                  controller: emailCtrl,
+                  decoration: const InputDecoration(labelText: "Email"),
+                ),
+                TextField(
+                  controller: passwordCtrl,
+                  decoration: const InputDecoration(labelText: "Password"),
+                  obscureText: true,
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Batal"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  nama = namaCtrl.text;
+                  email = emailCtrl.text;
+                  password = passwordCtrl.text;
+                });
+                Navigator.pop(context);
+              },
+              child: const Text("Simpan"),
+            )
+          ],
+        );
+      },
+    );
+  }
+
   Widget _buildField(String title, String value) {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
@@ -88,14 +212,8 @@ class ProfilePage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: const TextStyle(fontSize: 12, color: Colors.grey),
-          ),
-          Text(
-            value,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
+          Text(title, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+          Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
         ],
       ),
     );
