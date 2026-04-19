@@ -13,7 +13,6 @@ class Network extends StatefulWidget {
   @override
   State<Network> createState() => _NetworkState();
 
-  // 🔥 TAMBAHAN BARU (INI KUNCI FIX KAMU)
   static const platform = MethodChannel('limit_kuota/channel');
 
   static Future<Map<String, int>> getUsage() async {
@@ -36,7 +35,7 @@ class _NetworkState extends State<Network> {
 
   Future<void> fetchUsage() async {
     try {
-      final usage = await Network.getUsage(); // 🔥 PAKAI FUNCTION BARU
+      final usage = await Network.getUsage();
 
       String todayDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
 
@@ -55,7 +54,6 @@ class _NetworkState extends State<Network> {
       });
 
       await checkLimitAndWarn(wifiBytes + mobileBytes);
-
     } on PlatformException catch (e) {
       if (e.code == "PERMISSION_DENIED") {
         _showPermissionDialog();
@@ -127,10 +125,11 @@ class _NetworkState extends State<Network> {
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
 
+      // 🔥 APPBAR SAMA SIDEBAR
       appBar: AppBar(
         title: const Text("Limit Kuota"),
         centerTitle: true,
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.deepPurple,
         actions: [
           IconButton(
             icon: const Icon(Icons.history),
@@ -144,60 +143,90 @@ class _NetworkState extends State<Network> {
         ],
       ),
 
-      body: Column(
-        children: [
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(20),
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(colors: [Colors.blue, Colors.lightBlue]),
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(20),
-                bottomRight: Radius.circular(20),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            // 🔥 HEADER SAMA SIDEBAR
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.deepPurple,
+                    Colors.blue,
+                  ],
+                ),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(20),
+                  bottomRight: Radius.circular(20),
+                ),
+              ),
+              child: Column(
+                children: [
+                  const Icon(Icons.network_check,
+                      color: Colors.white, size: 60),
+                  const SizedBox(height: 10),
+                  const Text(
+                    "Monitoring Penggunaan Data",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    DateFormat('dd MMMM yyyy').format(DateTime.now()),
+                    style: const TextStyle(color: Colors.white70),
+                  ),
+                ],
               ),
             ),
-            child: Column(
-              children: [
-                const Icon(Icons.network_check, color: Colors.white, size: 60),
-                const SizedBox(height: 10),
-                const Text(
-                  "Monitoring Penggunaan Data",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  DateFormat('dd MMMM yyyy').format(DateTime.now()),
-                  style: const TextStyle(color: Colors.white70),
-                ),
-              ],
+
+            const SizedBox(height: 20),
+
+            _usageCard(
+              "WiFi Today",
+              wifiUsage,
+              Icons.wifi,
+              Colors.deepPurple,
             ),
-          ),
 
-          const SizedBox(height: 20),
+            const SizedBox(height: 15),
 
-          _usageCard("WiFi Today", wifiUsage, Icons.wifi, Colors.blue),
+            _usageCard(
+              "Mobile Today",
+              mobileUsage,
+              Icons.signal_cellular_alt,
+              Colors.blue,
+            ),
 
-          const SizedBox(height: 15),
+            const SizedBox(height: 30),
 
-          _usageCard(
-            "Mobile Today",
-            mobileUsage,
-            Icons.signal_cellular_alt,
-            Colors.green,
-          ),
+            // 🔥 BUTTON SAMA WARNA UTAMA
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepPurple,
+                foregroundColor: Colors.white,
+                elevation: 4,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 25, vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              onPressed: fetchUsage,
+              icon: const Icon(Icons.refresh),
+              label: const Text(
+                "Refresh Data",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
 
-          const SizedBox(height: 30),
-
-          ElevatedButton.icon(
-            onPressed: fetchUsage,
-            icon: const Icon(Icons.refresh),
-            label: const Text("Refresh Data"),
-          ),
-        ],
+            const SizedBox(height: 20),
+          ],
+        ),
       ),
     );
   }
@@ -209,6 +238,13 @@ class _NetworkState extends State<Network> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: color.withOpacity(0.2),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          )
+        ],
       ),
       child: Row(
         children: [
@@ -221,8 +257,14 @@ class _NetworkState extends State<Network> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title),
-              Text(value),
+              Text(title, style: const TextStyle(color: Colors.grey)),
+              Text(
+                value,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
             ],
           ),
         ],
