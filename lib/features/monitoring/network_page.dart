@@ -125,14 +125,18 @@ class _NetworkState extends State<Network> {
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
 
-      //  APPBAR SAMA SIDEBAR
+      // 🔥 APPBAR FIX
       appBar: AppBar(
-        title: const Text("Limit Kuota"),
+        title: const Text(
+          "Limit Kuota",
+          style: TextStyle(color: Colors.white), // 🔥 teks putih
+        ),
         centerTitle: true,
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: Colors.deepPurple, // 🔥 tetap ungu
+        iconTheme: const IconThemeData(color: Colors.white), // 🔥 icon jadi putih juga
         actions: [
           IconButton(
-            icon: const Icon(Icons.history),
+            icon: const Icon(Icons.history, color: Colors.white),
             onPressed: () {
               Navigator.push(
                 context,
@@ -146,7 +150,6 @@ class _NetworkState extends State<Network> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // 🔥 HEADER SAMA SIDEBAR
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
