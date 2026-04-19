@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
+// 🔥 TAMBAHAN
+import 'package:provider/provider.dart';
+import '../../core/providers/profile_provider.dart';
+
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
@@ -16,7 +20,6 @@ class _ProfilePageState extends State<ProfilePage> {
   String password = "12345678";
   String status = "Aktif";
 
-  // 🔥 TAMBAHAN FOTO
   File? _image;
   final ImagePicker _picker = ImagePicker();
 
@@ -53,7 +56,7 @@ class _ProfilePageState extends State<ProfilePage> {
             mainAxisSize: MainAxisSize.min,
             children: [
 
-              // 🔥 FOTO PROFIL (SUDAH BISA DIKLIK)
+              // 🔥 FOTO PROFIL
               GestureDetector(
                 onTap: _showImageSourceDialog,
                 child: CircleAvatar(
@@ -99,10 +102,17 @@ class _ProfilePageState extends State<ProfilePage> {
       setState(() {
         _image = File(pickedFile.path);
       });
+
+      // 🔥 UPDATE PROVIDER SAAT FOTO DIGANTI
+      context.read<ProfileProvider>().updateProfile(
+        nama,
+        email,
+        pickedFile.path,
+      );
     }
   }
 
-  // 🔥 DIALOG PILIH KAMERA / GALERI
+  // 🔥 DIALOG PILIH FOTO
   void _showImageSourceDialog() {
     showModalBottomSheet(
       context: context,
@@ -131,7 +141,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  // 🔥 DIALOG EDIT PROFIL (SUDAH ADA FOTO)
+  // 🔥 EDIT PROFIL
   void _showEditDialog() {
     TextEditingController namaCtrl = TextEditingController(text: nama);
     TextEditingController emailCtrl = TextEditingController(text: email);
@@ -146,7 +156,6 @@ class _ProfilePageState extends State<ProfilePage> {
             child: Column(
               children: [
 
-                // FOTO DI DALAM EDIT
                 GestureDetector(
                   onTap: _showImageSourceDialog,
                   child: CircleAvatar(
@@ -190,6 +199,14 @@ class _ProfilePageState extends State<ProfilePage> {
                   email = emailCtrl.text;
                   password = passwordCtrl.text;
                 });
+
+                // 🔥 INI YANG PALING PENTING
+                context.read<ProfileProvider>().updateProfile(
+                  namaCtrl.text,
+                  emailCtrl.text,
+                  _image?.path ?? "",
+                );
+
                 Navigator.pop(context);
               },
               child: const Text("Simpan"),
