@@ -11,7 +11,6 @@ void main() async {
 
   await NotificationService.init(); // 🔥 WAJIB
 
-  // 🔥 TAMBAHAN
   final profileProvider = ProfileProvider();
   await profileProvider.loadProfile(); // load data tersimpan
 
