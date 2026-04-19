@@ -125,7 +125,7 @@ class _NetworkState extends State<Network> {
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
 
-      // 🔥 APPBAR SAMA SIDEBAR
+      //  APPBAR SAMA SIDEBAR
       appBar: AppBar(
         title: const Text("Limit Kuota"),
         centerTitle: true,
@@ -204,7 +204,6 @@ class _NetworkState extends State<Network> {
 
             const SizedBox(height: 30),
 
-            // 🔥 BUTTON SAMA WARNA UTAMA
             ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.deepPurple,
