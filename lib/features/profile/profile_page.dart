@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
-// 🔥 TAMBAHAN
 import 'package:provider/provider.dart';
 import '../../core/providers/profile_provider.dart';
 
@@ -94,7 +93,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  // 🔥 PILIH FOTO
+  // PILIH FOTO
   Future<void> _pickImage(ImageSource source) async {
     final pickedFile = await _picker.pickImage(source: source);
 
@@ -103,7 +102,7 @@ class _ProfilePageState extends State<ProfilePage> {
         _image = File(pickedFile.path);
       });
 
-      // 🔥 UPDATE PROVIDER SAAT FOTO DIGANTI
+      //  UPDATE PROVIDER SAAT FOTO DIGANTI
       context.read<ProfileProvider>().updateProfile(
         nama,
         email,
@@ -112,7 +111,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  // 🔥 DIALOG PILIH FOTO
+  //  DIALOG PILIH FOTO
   void _showImageSourceDialog() {
     showModalBottomSheet(
       context: context,
@@ -141,7 +140,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  // 🔥 EDIT PROFIL
+  //  EDIT PROFIL
   void _showEditDialog() {
     TextEditingController namaCtrl = TextEditingController(text: nama);
     TextEditingController emailCtrl = TextEditingController(text: email);
@@ -200,7 +199,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   password = passwordCtrl.text;
                 });
 
-                // 🔥 INI YANG PALING PENTING
+                
                 context.read<ProfileProvider>().updateProfile(
                   namaCtrl.text,
                   emailCtrl.text,
