@@ -4,7 +4,6 @@ import '../../monitoring/history_page.dart';
 import '../../monitoring/network_page.dart';
 import '../../profile/profile_page.dart';
 
-// 🔥 TAMBAHAN
 import 'package:provider/provider.dart';
 import '../../../core/providers/profile_provider.dart';
 import 'dart:io';
@@ -24,7 +23,7 @@ class Sidebar extends StatelessWidget {
         builder: (context, profile, child) {
           return ListView(
             children: [
-              // 🔥 HEADER PROFILE (DINAMIS)
+              //  HEADER PROFILE 
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: const BoxDecoration(
@@ -48,14 +47,13 @@ class Sidebar extends StatelessWidget {
                     ),
                     const SizedBox(height: 10),
 
-                    // 🔥 NAMA DINAMIS
+                    
                     Text(
                       profile.name,
                       style:
                           const TextStyle(color: Colors.white, fontSize: 18),
                     ),
 
-                    // 🔥 EMAIL DINAMIS
                     Text(
                       profile.email,
                       style: const TextStyle(color: Colors.white70),
